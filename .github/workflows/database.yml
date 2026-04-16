@@ -1,0 +1,26 @@
+name: Database Task
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  database-connect:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Database Command
+        env:
+          # This securely pulls the password from your settings
+          DB_PASS: ${{ secrets.DB_PASSWORD }}
+          DB_USER: "admin_user"
+          DB_HOST: "db.example.com"
+        run: |
+          echo "Connecting to database..."
+          # Example: Using the env var in a command line tool
+          # Note: The actual password will be masked as *** in logs
+          mysql -h $DB_HOST -u $DB_USER -p"$DB_PASS" -e "SHOW TABLES;"
