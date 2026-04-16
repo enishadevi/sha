@@ -16,7 +16,7 @@ jobs:
       - name: Run Database Command
         env:
           # This securely pulls the password from your settings
-          DB_PASS: ${{ secrets.DB_PASSWORD }}
+          DB_PASS: ${{ secrets.API_KEY }}
           DB_USER: "admin_user"
           DB_HOST: "db.example.com"
         run: |
