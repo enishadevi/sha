@@ -1,4 +1,4 @@
-name: Database Task
+name: Database Secret Test
 
 on:
   push:
@@ -8,19 +8,22 @@ on:
 jobs:
   database-connect:
     runs-on: ubuntu-latest
+    
+    # This creates a real database for the duration of the job
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run Database Command
+      - name: Test Secret Connection
         env:
-          # This securely pulls the password from your settings
-          DB_PASS: ${{ secrets.API_KEY }}
-          DB_USER: "admin_user"
-          DB_HOST: "db.example.com"
+          DB_PASS: ${{ secrets.DB_PASSWORD }}
         run: |
-          echo "Connecting to database..."
-          # Example: Using the env var in a command line tool
-          # Note: The actual password will be masked as *** in logs
-          mysql -h $DB_HOST -u $DB_USER -p"$DB_PASS" -e "SHOW TABLES;"
+          echo "Connecting to the local service container..."
+          # We use 127.0.0.1 because the DB is running inside the runner
+          mysql -h 127.0.0.1 -u root -p"$DB_PASS" -e "SELECT 'Secret Injection Successful' AS Status;"
